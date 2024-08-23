@@ -18,7 +18,7 @@ function displayCpuMemUsage {
 
 
 function displayProcessesByVss {
-  "displayProcessByVss"
+  "displayProcessesByVss"
 }
 
 
@@ -61,7 +61,7 @@ function Run-Menu {
     $RunOnce = $false
   )
   while ($true) {
-    if (-not $HideMenu) {
+    if ($HideMenu -eq $false) {
       Show-Menu
     }
     if ($answer -eq "") {
@@ -76,7 +76,16 @@ function Run-Menu {
       Default { "Invalid input. Only 1-5 are recognized. Press 5 to exit."}
     }
     if ($RunOnce) {
-      exit
+      break
     }
+    Clear-Variable answer
+    Clear-Host
   }
+}
+
+# Only execute Run-Menu if called as a script,
+# rather than dot sourced or called using an
+# operator.
+If ((Resolve-Path -Path $MyInvocation.InvocationName).ProviderPath -eq $MyInvocation.MyCommand.Path) {
+  Run-Menu
 }
