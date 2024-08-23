@@ -1,0 +1,10 @@
+# Keep vscode configuration out of the repo
+.vscode
+
+# Crap from mac and windows file managers
+.DS_Store
+Thumbs.db
+
+# backup files
+*.ps1~
+*.ps1.swp
