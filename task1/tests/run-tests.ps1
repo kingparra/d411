@@ -1,8 +1,4 @@
-Import-Module PackageManagement
-
-# Force is used to in case windows 10 already has an older version of pester installed
-Install-Module Pester -Force
-
+#!/usr/bin/env pwsh
 Import-Module Pester
 
 # Run the pester test on the root of this project directory, task1
