@@ -3,8 +3,36 @@
 
 
 function displayAscendingFiles {
-  "displayAscendingFiles"
+  [CmdletBinding()]
+  param (
+    # Directory to list files from
+    [Parameter()]
+    [String]
+    $Directory,
+
+    # Whether to append to the file or output directly
+    [Parameter(Mandatory=$false)]
+    [Switch]
+    $ValueOnly,
+
+    # File to append list of existing files to
+    [Parameter(Mandatory=$true)]
+    [String]
+    $OutFile
+  )
+  if (Validate-Directory $Directory) {
+    # List the files sorted in ascending alphabetical order using tabular output.
+    $result = Get-ChildItem $Directory | Sort-Object { $_.Name }
+    # Direct the output into a new file.
+    if ($ValueOnly) {
+      $result
+    } else {
+      Write-Output "Wrote ascending files list to $OutFile"
+      $result | Out-String -Width 100000000  > $OutFile
+    }
+  }
 }
+
 
 function Validate-Directory($dir) {
   if ((Test-Path $dir) -eq $false) {
@@ -92,7 +120,6 @@ function displayProcessesByVss {
     # return formatted text
     $formated
   }
-
 }
 
 
@@ -143,7 +170,7 @@ function Run-Menu {
     }
     switch ($answer) {
       1 { appendLogFileNames -Directory "$env:PROJ_ROOT/data" -OutFile "$env:PRROJ_ROOT/data/DailyLog.txt" | more }
-      2 { displayAscendingFiles | more }
+      2 { displayAscendingFiles -Directory "$env:PROJ_ROOT/data" -OutFile "$env:PROJ_ROOT/data/C916contents.txt" | more }
       3 { displayCpuMemUsage | more }
       4 { displayProcessesByVss | more }
       5 { exit }
@@ -156,6 +183,7 @@ function Run-Menu {
     Clear-Host
   }
 }
+
 
 # Only execute Run-Menu if called as a script,
 # rather than dot sourced or called using an
