@@ -2,11 +2,6 @@
 # Run various sysadmin tasks from an interactive menu.
 
 
-function appendLogFileNames {
-  "appendLogFileNames"
-}
-
-
 function displayAscendingFiles {
   "displayAscendingFiles"
 }
