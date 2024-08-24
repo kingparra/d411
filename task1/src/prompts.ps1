@@ -69,9 +69,9 @@ function Run-Menu {
     }
     switch ($answer) {
       1 { appendLogFileNames -Directory "$env:PROJ_ROOT/data" -OutFile "$env:PRROJ_ROOT/data/DailyLog.txt" }
-      2 { displayAscendingFiles }
-      3 { displayCpuMemUsage }
-      4 { displayProcessesByVss }
+      2 { displayAscendingFiles | more }
+      3 { displayCpuMemUsage | more }
+      4 { displayProcessesByVss | more }
       5 { exit }
       Default { "Invalid input. Only 1-5 are recognized. Press 5 to exit."}
     }
