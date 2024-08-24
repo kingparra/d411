@@ -147,7 +147,7 @@ function Run-Menu {
       [Int]$answer = Read-Host "`nEnter task number [1-5]"
     }
     switch ($answer) {
-      1 { appendLogFileNames -Directory "$env:PROJ_ROOT/data" -OutFile "$env:PRROJ_ROOT/data/DailyLog.txt" }
+      1 { appendLogFileNames -Directory "$env:PROJ_ROOT/data" -OutFile "$env:PRROJ_ROOT/data/DailyLog.txt" | more }
       2 { displayAscendingFiles | more }
       3 { displayCpuMemUsage | more }
       4 { displayProcessesByVss | more }
