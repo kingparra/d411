@@ -74,13 +74,13 @@ function appendLogFileNames {
   )
   if ((Validate-Directory $Directory) -and (Validate-File $OutFile)) {
     $names = Get-ChildItem $Directory |
-    Where-Object { $_.Name -cmatch '.*\.log$' } |
-    ForEach-Object { $_.Name }
+             Where-Object { $_.Name -cmatch '.*\.log$' } |
+             ForEach-Object { $_.Name }
     if ($names.Count -eq 0) {
       $names = @("[no_files_found]")
     }
     $date = Get-Date -Format "HH:mm:dd"
-    $result = "$date $names`n"
+    $result = "$date $names"
     if ($ValueOnly) {
       # Output object directly
       $result
@@ -169,7 +169,7 @@ function Run-Menu {
       [Int]$answer = Read-Host "`nEnter task number [1-5]"
     }
     switch ($answer) {
-      1 { appendLogFileNames -Directory "$env:PROJ_ROOT/data" -OutFile "$env:PRROJ_ROOT/data/DailyLog.txt" | more }
+      1 { appendLogFileNames -Directory "$env:PROJ_ROOT/data" -OutFile "$env:PROJ_ROOT/data/DailyLog.txt" | more }
       2 { displayAscendingFiles -Directory "$env:PROJ_ROOT/data" -OutFile "$env:PROJ_ROOT/data/C916contents.txt" | more }
       3 { displayCpuMemUsage | more }
       4 { displayProcessesByVss | more }
