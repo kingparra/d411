@@ -18,7 +18,28 @@ function displayCpuMemUsage {
 
 
 function displayProcessesByVss {
-  "displayProcessesByVss"
+  [CmdletBinding()]
+  param (
+    # Output objects or formatted text
+    [Parameter(Mandatory=$false)]
+    [Switch]
+    $AsObjects
+  )
+  $processes = Get-Process
+  # Sort by virtual size least to greatest
+  $sorted = $processes | Sort-Object { $_.VirtualMemorySize }
+  # Show Vss column in output table
+  $columnated = $sorted | Select-Object Id, VirtualMemorySize, BasePriority, CommandLine
+  if ($AsObjects) {
+    # return columnated objects
+    $columnated
+  } else {
+    # convert to text with unlimited line width
+    $formated = $columnated | Out-String -Width 100000000
+    # return formatted text
+    $formated
+  }
+
 }
 
 
