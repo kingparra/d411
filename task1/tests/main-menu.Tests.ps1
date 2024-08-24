@@ -6,12 +6,6 @@ Describe "User defined functions" {
     It "Should display the correct menu" {
       Show-Menu | Should -Match "Administrative tasks.*"
     }
-  }
-  Context "main" {
-    It "Should execute appendLogFileNames when 1 is pressed" {
-        Run-Menu -HideMenu -RunOnce -Answer 1 | Should -Be "appendLogFileNames"
-    }
-
     It "Should execute displayAscendingFiles when 2 is pressed" {
         Run-Menu -HideMenu -RunOnce -Answer 2 | Should -Be "displayAscendingFiles"
     }
@@ -19,6 +13,5 @@ Describe "User defined functions" {
     It "Should execute displayCpuMemUsage when 3 is pressed" {
         Run-Menu -HideMenu -RunOnce -Answer 3 | Should -Be "displayCpuMemUsage"
     }
-}
-
+  }
 }

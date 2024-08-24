@@ -11,6 +11,64 @@ function displayAscendingFiles {
   "displayAscendingFiles"
 }
 
+function Validate-Directory($dir) {
+  if ((Test-Path $dir) -eq $false) {
+    throw "File does not exist or is inaccesible"
+  } elseif (Test-Path -PathType Leaf $dir) {
+    throw "Directory must be directory not a file"
+  } else {
+    $true
+  }
+}
+
+
+function Validate-File($file) {
+  if (Test-Path -PathType Container $file) {
+    throw "OutFile must be a file, not a directory"
+  } else {
+    $true
+  }
+}
+
+
+function appendLogFileNames {
+  [CmdletBinding()]
+  param (
+    # Directory to list *.log files from
+    [Parameter(Mandatory=$true)]
+    [String]
+    $Directory,
+
+    # File to append list of existing log files to
+    [Parameter(Mandatory=$true)]
+    [String]
+    $OutFile,
+
+    # Whether to append to the file or output directly
+    [Parameter(Mandatory=$false)]
+    [Switch]
+    $ValueOnly
+  )
+  if ((Validate-Directory $Directory) -and (Validate-File $OutFile)) {
+    $names = Get-ChildItem $Directory |
+    Where-Object { $_.Name -cmatch '.*\.log$' } |
+    ForEach-Object { $_.Name }
+    if ($names.Count -eq 0) {
+      $names = @("[no_files_found]")
+    }
+    $date = Get-Date -Format "HH:mm:dd"
+    $result = "$date $names`n"
+    if ($ValueOnly) {
+      # Output object directly
+      $result
+    } else {
+      Write-Output "Wrote log entry to $OutFile."
+      # Append results to a file.
+      $result >> $OutFile
+    }
+  }
+}
+
 
 function displayCpuMemUsage {
   "displayCpuMemUsage"
