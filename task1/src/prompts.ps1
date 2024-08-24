@@ -92,11 +92,29 @@ function appendLogFileNames {
   }
 }
 
-
 function displayCpuMemUsage {
-  "displayCpuMemUsage"
+  # List the current CPU and memory usage.
+  if ([System.Environment]::OSVersion.Platform -eq "Win32NT") {
+    $cpuTime  = ((Get-Counter '\Processor(_Total)\% Processor Time'
+                  ).CounterSamples.CookedValue).ToString("#,0.000")
+    $availMem = ( Get-Counter '\Memory\Available MBytes'
+                ).CounterSamples.CookedValue * 104857600
+    $totalMem = ( Get-CimInstance Win32_PhysicalMemory |
+                  Measure-Object -Property capacity -Sum
+                ).Sum
+    $usedRam = ($availMem / $totalMem).ToString('#,0.0')
+    $result = (
+      "%CPU (across all CPUs): $cpuTime",
+      "%Mem: $usedRam"
+    ) -join "`n"
+    $result
+  } else {
+    # This is the only solution that doesn't involve complicated
+    # parsing of top output or doing math based on /proc/meminfo.
+    Write-Output "Memory and CPU usage (all units are MiB)"
+    vmstat --wide --unit M
+  }
 }
-
 
 function displayProcessesByVss {
   [CmdletBinding()]
