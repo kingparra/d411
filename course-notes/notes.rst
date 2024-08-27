@@ -737,18 +737,14 @@ List slicing is pretty much the same as other C-like languages.
   $a[-3..-1]
   $a[0,2+4..6]
 
-Multi-demensional arrays suck in powershell.
-
-::
-
-  # this is *not* a multi-dimensional array!
-  $a = @(
-    @(0,1),
-    @("b", "c"),
-    @(Get-Process)
-  )
-
-  # this is (;_;).... ;;;
+PowerShell many ways to express collections.
+One is a multidimension array.
+With true multidimensional arrays,
+the number of elements for each level of arrays is predetermined at the time of creation,
+and cannot be changed without creating a new array.
+So you can't have an array that contains arrays of different lengths.
+The elements inside the innermost array must also be of the same type.
+Elements are layed out continguously in memory.
 
   $ [string[,]]$rank2 = [string[,]]::New(3,2)
   $ $rank2.rank
@@ -765,24 +761,61 @@ Multi-demensional arrays suck in powershell.
   6
   d
 
-  # notice the weird list slicing notation? Why not $rank2[0][0] = 'a'?
-  # this is all very confusing
+For true multidimension arrays like this you can
+query how many dimensions it has with rank.
 
-  >>> $matrix = New-Object 'object[,]' 2,2 # 2d array of length 4
-  >>> $matrix[0,0] = 10
-  >>> $matrix[0,1] = $false
-  >>> $matrix[1,0] = "red"
-  >>> $matrix[1,1] = "blue"
-  >>> $matrix.Rank
-  2
-
-Arrays have a handy ForEach method.
 ::
 
-  >>> @(1,2,3).ForEach({$_ + 3})
-  4
-  5
-  6
+  ·∾ $rank2 = [string[,]]::New(3,2)
+  ·∾ $rank2.Rank
+  2
+
+There is also the concept of a jagged array.
+Jagged arrays are closer to lists in Python.
+
+::
+
+  ·∾ $jagged = (1, 2, 3, (10, 20, 30), 4)
+  ·∾ $jagged[0]
+  1
+  ·∾ $jagged[3]
+  10
+  20
+  30
+  ·∾ $jagged[3][0]
+  10
+
+You can have heterogeneous element types in jagged arrays.
+
+::
+
+  ·∾ $jagged2 = (1,2,3,('a','b',100))
+  ·∾ $jagged2[3][0]
+  a
+  ·∾ $jagged2[3][2]
+  100
+
+Jagged arrays don't support using rank to get the max nesting level.
+
+::
+
+  ·∾ (1,2,3,('a','b','c')).Rank
+  1
+
+PowerShell has a tendncy to implicitly unwrap arrays.
+For example, if you use a switch statement to match on an array,
+it will iterate through all elements.
+
+::
+
+  ·∾ $roles = "WEB", "Database"
+  ·∾ switch ($roles) {
+  ⋮   "Database" { "Configure SQL" }
+  ⋮   "WEB"      { "Configure IIS" }
+  ⋮   "FileServer" { "Configure Share" }
+  ⋮ }
+  Configure IIS
+  Configure SQL
 
 
 Hashtables
