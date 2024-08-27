@@ -320,6 +320,174 @@ Program structuring mechanisms
   # https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_calling_generic_methods?view=powershell-7.4
 
 
+Classes
+-------
+What's the difference between an initialization method and a regular method?
+Nothing, init methods just set properties. That's all. That's the difference.
+
+::
+
+  ·∾ class Tree {
+   ⋮  [Int]$Height
+   ⋮  [Int]$Age
+   ⋮  [String]$Color
+   ⋮ }
+
+  # There are three ways to construct an object from a class.
+  ·∾ $tree1 = New-Object Tree
+  ·∾ $tree1.Height = 10; $tree1.Age = 5; $tree1.Color = "Red"
+  ·∾ $tree2 = [Tree]::new()
+  ·∾ $tree2.Height = 20; $tree2.Age = 10; $tree2.Color = "Green"
+  ·∾ $tree4 = [Tree]::new(@{"Height" = 30; "Age" = 15; "Color" = "Blue"})
+  ·∾ $tree4 = [Tree]@{"Height" = 30; "Age" = 15; "Color" = "Blue"}
+
+  ·∾ $tree1
+  Height Age Color
+  ------ --- -----
+      10   5 Red
+
+  ·∾ $tree2
+  Height Age Color
+  ------ --- -----
+      20  10 Green
+
+  ·∾ $tree3
+  Height Age Color
+  ------ --- -----
+      30  15 Blue
+
+  ·∾ $tree4
+  Height Age Color
+  ------ --- -----
+      30  15 Blue
+
+  # Get all members of a class
+  ·∾ [System.Math] | Get-Member -Static -MemberType All
+
+  ·∾ class Tree {
+   ⋮   [Int]$Height
+   ⋮   [Int]$Age
+   ⋮   [String]$Color
+   ⋮
+   ⋮   Tree() {
+   ⋮     $this.Height = 1
+   ⋮     $this.Age = 0
+   ⋮     $this.Color = "Green"
+   ⋮   }
+   ⋮
+   ⋮   Tree([Int]$Height, [Int]$Age, [String]$Color) {
+   ⋮     $this.Height = $Height
+   ⋮     $this.Age = $Age
+   ⋮     $this.Color = $Color
+   ⋮   }
+   ⋮ }
+  ·∾
+
+  ·∾ $tree1 = [Tree]::new()
+  ·∾ $tree2 = New-Object Tree 5, 2, "Red"
+
+  ·∾ $tree1
+  Height Age Color
+  ------ --- -----
+       1   0 Green
+
+  ·∾ $tree2
+  Height Age Color
+  ------ --- -----
+       5   2 Red
+
+  ·∾ class Tree {
+   ⋮   [Int]$Height
+   ⋮   [Int]$Age
+   ⋮   [String]$Color
+   ⋮
+   ⋮   Tree() {
+   ⋮     $this.Height = 1
+   ⋮     $this.Age = 0
+   ⋮     $this.Color = "Green"
+   ⋮   }
+   ⋮
+   ⋮   Tree([Int]$Height, [Int]$Age, [String]$Color) {
+   ⋮     $this.Height = $Height
+   ⋮     $this.Age = $Age
+   ⋮     $this.Color = $Color
+   ⋮   }
+   ⋮
+   ⋮   [Void]Grow() {
+   ⋮     $heightIncrease = Get-Random -Min 1 -Max 5
+   ⋮     $this.Height += $heightIncrease
+   ⋮     $this.Age += 1
+   ⋮   }
+   ⋮ }
+
+  ·∾ $tree = [Tree]::New()
+  ·∾ for ($i = 0; $i -lt 10; $i++) { $tree.Grow(); $tree }
+  Height Age Color
+  ------ --- -----
+       3   2 Green
+       6   3 Green
+      10   4 Green
+      11   5 Green
+      14   6 Green
+      15   7 Green
+      17   8 Green
+      19   9 Green
+      22  10 Green
+      24  11 Green
+
+  ·∾ # Where classes become useful is when you start to use inheritance
+  ·∾ class Tree {
+   ⋮   [Int]$Height
+   ⋮   [Int]$Age
+   ⋮   [String]$Color
+   ⋮
+   ⋮   Tree() {
+   ⋮     $this.Height = 1
+   ⋮     $this.Age = 0
+   ⋮     $this.Color = "Green"
+   ⋮   }
+   ⋮
+   ⋮   Tree([Int]$Height, [Int]$Age, [String]$Color) {
+   ⋮     $this.Height = $Height
+   ⋮     $this.Age = $Age
+   ⋮     $this.Color = $Color
+   ⋮   }
+   ⋮
+   ⋮   [Void]Grow() {
+   ⋮     $heightIncrease = Get-Random -Min 1 -Max 5
+   ⋮     $this.Height += $heightIncrease
+   ⋮     $this.Age += 1
+   ⋮   }
+   ⋮ }
+  ·∾ class AppleTree : Tree {
+   ⋮   [String]$Species = "Apple"
+   ⋮ }
+  ·∾ $tree = [AppleTree]::New()
+  ·∾ $tree
+
+  Species Height Age Color
+  ------- ------ --- -----
+  Apple        1   0 Green
+
+
+
+Interfaces
+----------
+* https://stackoverflow.com/questions/51794092/how-to-use-interfaces-in-powershell-defined-via-add-type
+
+::
+
+  ·∾ Add-Type -TypeDefinition 'public interface ICanTalk { string talk(); }' -Language CSharp
+
+  ·∾ class Talker : ICanTalk {
+  ⋮   [String]talk() { return "Well hello there" }
+  ⋮ }
+  ·∾
+
+  ·∾ $talker = [Talker]::new()
+  ·∾ $talker.talk()
+  Well hello there
+
 
 Providers, modules, and snap-ins
 --------------------------------
@@ -899,7 +1067,8 @@ Now for some examples from the repl.
 
   # If you want to loop over an input parameter from the pipeline,
   # you can use ValueFromPipeline=$true and the process block.
-  #
+  #Write a script to interact with a database server to automate the database administrator (DBA) tasks
+
   >>> function New-Website() {
   >>>   [CmdletBinding()]
   >>>   param (
@@ -1008,6 +1177,7 @@ same time, use ``*>``. Since windows doesn't have ``/dev/null`` you can
 redirect to the ``$null`` variable to discard input.
 
 ::
+Write a script to interact with a database server to automate the database administrator (DBA) tasks
 
   # Related commands: Out-File, Tee-Object
 
