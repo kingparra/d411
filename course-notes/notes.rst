@@ -1315,3 +1315,59 @@ How do I lay out a new project
 ------------------------------
 * https://github.com/PoshCode/PowerShellPracticeAndStyle
 * https://dev.to/this-is-learning/how-to-write-better-powershell-scripts-architecture-and-best-practices-emh
+
+
+Adminstrative tasks
+-------------------
+
+Manage Office365
+^^^^^^^^^^^^^^^^
+::
+
+  # Create a session to Office365
+  $URL = "https://ps.outlook.com/powershell"
+  $Credentials = Get-Credential -Message "Enter your Exchange Online or Office 365 administrator credentials"
+  $CloudSession = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri $URL -Credential $Credentials -Authentication Basic -AllowRedirection -Name "Office 365/Exchange Online"
+  Import-PSSession $CloudSession -Prefix 365
+
+  # Assign rights to mailboxes
+  # full access
+  Add-MailboxPermission -identity themailboxinquestion `
+    -user theuserwhoneedsaccesstothatmailbox `
+    -AccessRights FullAccess `
+    -InheritanceType All
+
+  # First, change the mailbox type to convert the mailbox to a shared account:
+  Set-Mailbox -Identity departedemployee -Type Shared -ProhibitSendReceiveQuota 5GB -ProhibitSendQuota 4.75GB -IssueWarningQuota 4.5GB
+
+  # Then, remove the license from the mailbox to eliminate the monthly charge.
+  $MSOLSKU = (Get-MSOLUser -UserPrincipalName departedemployee).Licenses[0].AccountSkuId
+  Set-MsolUserLicense -UserPrincipalName departedemployee -RemoveLicenses $MSOLSKU
+
+  # Obtaining last logon times for a Office365 account
+  Get-Mailbox | Get-MailboxStatistics | Sort DisplayName | FT -AutoSize DisplayName, LastLogonTime
+
+  # WARNING: The user hasn't logged on to mailbox 'Discov-
+  # erySearchMailbox{D919BA05-46A6-415f-80AD-7E0933
+  # 4BB852}' ('65d5e60b-1ff1-493b-830e-460478a919c8'), so
+  # there is no data to return. After the user log
+  # s on, this warning will no longer appear.
+  # DisplayName LastLogonTime
+  # ----------- -------------
+  # Jonathan Hassell 11/16/2015 12:09:13 PM
+  # Salt Rose Marketing 11/16/2015 8:49:29 AM
+
+  # Add users
+  Import-Module ActiveDirectory
+  Import-Csv "C:\powershell\users.csv" | ForEach-Object {
+    $userPrincipal = $_."samAccountName" + "@yourdomain.local"
+    New-ADUser -Name $_.Name `
+      -Path $_."ParentOU" `
+      -SamAccountName $_."samAccountName" `
+      -UserPrincipalName $userPrincipal `
+      -AccountPassword (ConvertTo-SecureString "cheeseburgers4all" -AsPlainText -Force) `
+      -ChangePasswordAtLogon $true `
+      -Enabled $true
+    Add-ADGroupMember "Office Users"
+    $_."samAccountName";
+  }
