@@ -489,6 +489,32 @@ Interfaces
   Well hello there
 
 
+Enums
+-----
+It seems that PowerShell has something similar to sum types.
+
+::
+
+  ·∾ enum Context { Component; Role; Location }
+  ·∾ $item = [Context]::Role
+  ·∾ Switch ($item) {
+  ⋮   Component { 'is a component' }
+  ⋮   Role      { 'is a role' }
+  ⋮   Location  { 'is a location' }
+  ⋮ }
+  is a role
+
+I'm not sure, but the switch statement may be doing silent type
+coercion to strings. You can write this more explicity if you like.
+
+::
+
+  switch ($item ) {
+      ([Context]::Component) {'is a component'}
+      ([Context]::Role) {'is a role'}
+      ([Context]::Location) {'is a location'}
+  }
+
 Providers, modules, and snap-ins
 --------------------------------
 Providers take some resource and represent it as a virtual file system.
