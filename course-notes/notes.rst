@@ -92,7 +92,7 @@ Or if you want to prepend to it, use this:
 
 ::
 
-
+  $env:Path = "whatever;" + $env:Path
 
 You can start a new shell without any profile using.
 
@@ -694,6 +694,8 @@ Filter, map, sort, take, uniq
     Group-Object -Property eventid |
     Sort-Object Count -descending |
     Format-Table Count, Name -autosize
+
+
 Architecture
 ------------
 ::
@@ -1347,15 +1349,19 @@ Manage Office365
   # Obtaining last logon times for a Office365 account
   Get-Mailbox | Get-MailboxStatistics | Sort DisplayName | FT -AutoSize DisplayName, LastLogonTime
 
-  # WARNING: The user hasn't logged on to mailbox 'Discov-
-  # erySearchMailbox{D919BA05-46A6-415f-80AD-7E0933
-  # 4BB852}' ('65d5e60b-1ff1-493b-830e-460478a919c8'), so
-  # there is no data to return. After the user log
-  # s on, this warning will no longer appear.
+  # WARNING: The user hasn't logged on to mailbox
+  # 'DiscoverySearchMailbox{D919BA05-46A6-415f-80AD-7E09334BB852}'
+  # ('65d5e60b-1ff1-493b-830e-460478a919c8'), so there is no data to return.
+  # After the user logs on, this warning will no longer appear.
+  #
   # DisplayName LastLogonTime
   # ----------- -------------
   # Jonathan Hassell 11/16/2015 12:09:13 PM
   # Salt Rose Marketing 11/16/2015 8:49:29 AM
+
+Manage Active Directory
+^^^^^^^^^^^^^^^^^^^^^^^
+::
 
   # Add users
   Import-Module ActiveDirectory
@@ -1371,3 +1377,34 @@ Manage Office365
     Add-ADGroupMember "Office Users"
     $_."samAccountName";
   }
+
+
+Check if query returned a result
+--------------------------------
+Let's say you just ran a ``Get-*`` command,
+assigned the result to a variable,
+and want to check if the variable is empty or contains a result.
+
+::
+
+  ·∾ $ou = Get-ADOrganizationalUnit -Filter {(ObjectClass -eq 'organizationalunit') -and (Name -eq "Finance")}
+
+For this task, you can put the value in an if clause without any comparison operation.
+
+::
+
+  ·∾ if ($ou) {
+  ⋮   "ou exists"
+  ⋮ } else {
+  ⋮   "ou query returned no results"
+  ⋮ }
+  ou query returned no results
+
+The statement above will actually perform all of these checks by default:
+
+  * not Null
+  * not empty
+  * not 0
+  * not an array,
+  * Length is not equal to 0
+  * not $false
